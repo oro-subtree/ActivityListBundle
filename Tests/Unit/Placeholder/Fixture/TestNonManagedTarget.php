@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture;
 
-class TestTarget
+class TestNonManagedTarget
 {
     /** @var int */
     protected $id;
