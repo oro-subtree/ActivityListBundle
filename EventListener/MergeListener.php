@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\EventListener;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
@@ -21,22 +21,22 @@ class MergeListener
     /** @var ConfigProvider */
     protected $configProvider;
 
-    /** @var ActivityListChainProvider */
-    protected $activityListChainProvider;
+    /** @var ActivityManager */
+    protected $activityManager;
 
     /**
      * @param TranslatorInterface $translator
      * @param ConfigProvider $configProvider
-     * @param ActivityListChainProvider $activityListChainProvider
+     * @param ActivityManager $activityManager
      */
     public function __construct(
         TranslatorInterface $translator,
         ConfigProvider $configProvider,
-        ActivityListChainProvider $activityListChainProvider
+        ActivityManager $activityManager
     ) {
         $this->translator = $translator;
         $this->configProvider = $configProvider;
-        $this->activityListChainProvider = $activityListChainProvider;
+        $this->activityManager = $activityManager;
     }
 
     /**
@@ -54,6 +54,7 @@ class MergeListener
                 'is_virtual'    => true,
                 'type'          => $type,
                 'field_name'    => $this->getFieldNameByActivityClassName($type),
+//                'template'      => 'test',
                 'is_collection' => true,
                 'label'         => $this->translator->trans($this->getAliasByActivityClass($type)),
                 'merge_modes'   => [MergeModes::UNITE, MergeModes::REPLACE]
@@ -72,14 +73,9 @@ class MergeListener
     protected function getAvailableActivityTypes(EntityMetadata $entityMetadata)
     {
         $className = $entityMetadata->getClassName();
-        $types = [];
-        foreach ($this->activityListChainProvider->getSupportedActivities() as $type) {
-            if ($this->activityListChainProvider->isApplicableTarget($className, $type)) {
-                $types[] = $type;
-            }
-        }
+        $types = $this->activityManager->getActivities($className);
 
-        return $types;
+        return array_keys($types);
     }
 
     /**
