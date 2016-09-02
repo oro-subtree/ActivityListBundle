@@ -1,4 +1,4 @@
-oro_system_configuration:
+system_configuration:
     groups:
         activity_list_settings:
             title:  oro.activitylist.system_configuration.activity_list.label
